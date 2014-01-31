@@ -1,6 +1,3 @@
-// ConsoleApplication2.cpp: определяет точку входа для консольного приложения.
-//
-
 #include "stdafx.h"
 #include <cmath>
 #include <conio.h>
@@ -151,34 +148,37 @@ float decode32_2(const Vec4& v) {
 	return s * exp2(e - 23.0f) * m;
 };
 
-int _tmain(int argc, _TCHAR* argv[])
-{
-	//Vec4 x = EncodeFloatRGBA(0.0);
-	//float e = DecodeFloatRGBA(x);
+void test1() {
+	Vec4 x = EncodeFloatRGBA(0.0);
+	float e = DecodeFloatRGBA(x);
+};
 
-	std::cout << "begin.";
+void test2() {
+	float step = 0.001f;
+	for (float val = -0.0; val < 10000.0; val += step) {
+		Vec4 res = encode32(val);
+		float e = decode32(res);
+		float eps = val - e;
 
-	//float step = 0.001f;
-	//Vec4 res;
-	//for (float val = -0.0; val < 10000.0; val += step) {
-	//	encode32(val, &res);
-	//	float e = decode32(res);
-	//	float eps = val - e;
+		if ((res.x > 255 || res.y > 255 || res.z > 255 || res.w > 255) ||
+			(res.x < 0 || res.y < 0 || res.z < 0 || res.w < 0) ||
+			eps > 0.003 || eps < -0.003) {
+			std::cout << "val=" << std::to_string(val) << ", (" << res.x << "," << res.y << "," << res.z << "," << res.w << "), e=" << std::to_string(e) << ", eps=" << eps << "\n";
+		}
+	}
+};
 
-	//	if ((res.x > 255 || res.y > 255 || res.z > 255 || res.w > 255) ||
-	//		(res.x < 0 || res.y < 0 || res.z < 0 || res.w < 0) ||
-	//		eps > 0.003 || eps < -0.003) {
-	//		std::cout << "val=" << std::to_string(val) << ", (" << res.x << "," << res.y << "," << res.z << "," << res.w << "), e=" << std::to_string(e) << ", eps=" << eps << "\n";
-	//	}
-	//}
+void test3() {
 	Vec4 enc = encode32(1002.233f);
 	float x = decode32(enc);
 
-
 	Vec4 enc2 = encode32_2(1002.233f);
 	float x2 = decode32_2(enc2);
+};
 
-	std::cout << "done.";
+int _tmain(int argc, _TCHAR* argv[]) {
+
+	//Test here
 
 	_getch();
 	return 0;
