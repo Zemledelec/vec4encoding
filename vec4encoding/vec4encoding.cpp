@@ -137,7 +137,6 @@ float decode32(const Vec4& rgba) {
 	return s * exp2(e) * (m * exp2(-23.0f));
 };
 
-//better precision 32 bit
 float decode32_2(const Vec4& v) {
 	Vec4 rgba = mult(255.0f, v);
 	float s = 1.0f - step(128.0f, rgba.x)*2.0f;
@@ -148,14 +147,9 @@ float decode32_2(const Vec4& v) {
 	return s * exp2(e - 23.0f) * m;
 };
 
-void test1() {
-	Vec4 x = EncodeFloatRGBA(0.0);
-	float e = DecodeFloatRGBA(x);
-};
-
 void test2() {
 	float step = 0.001f;
-	for (float val = -0.0; val < 10000.0; val += step) {
+	for (float val = 0.0; val < 10000.0; val += step) {
 		Vec4 res = encode32(val);
 		float e = decode32(res);
 		float eps = val - e;
@@ -165,6 +159,19 @@ void test2() {
 			eps > 0.003 || eps < -0.003) {
 			std::cout << "val=" << std::to_string(val) << ", (" << res.x << "," << res.y << "," << res.z << "," << res.w << "), e=" << std::to_string(e) << ", eps=" << eps << "\n";
 		}
+	}
+};
+
+void doubleToTwoFloats(double value, float* low, float* high) {
+	if (value >= 0.0) {
+		double doubleHigh = floor(value / 65536.0) * 65536.0;
+		*high = (float)doubleHigh;
+		*low = (float)(value - doubleHigh);
+	}
+	else {
+		double doubleHigh = floor(-value / 65536.0) * 65536.0;
+		*high = (float)(-doubleHigh);
+		*low = (float)(value + doubleHigh);
 	}
 };
 
@@ -178,7 +185,13 @@ void test3() {
 
 int _tmain(int argc, _TCHAR* argv[]) {
 
+	//float x = float(0x800000);
 	//Test here
+	//test2();
+
+	float low;
+	float high;
+	doubleToTwoFloats(549755748352, &low, &high);
 
 	_getch();
 	return 0;
